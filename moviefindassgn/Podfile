@@ -1,0 +1,8 @@
+platform :ios, '11.0'
+use_frameworks!
+target 'moviefindassgn' do
+  pod 'Alamofire', '~> 5.4'
+  pod 'Kingfisher', '~> 6.3'
+  pod 'RealmSwift', '~> 10.20'
+
+end
