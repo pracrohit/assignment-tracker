@@ -26,6 +26,8 @@
             android:label="New Page Activity" />
         <activity android:name=".ViewModel.TaskAdapter"
             android:label="Tasks adder" />
+        <activity android:name=".View.EditTaskActivity"
+        android:label="Tasks Updater" />
     </application>
 
 </manifest>
