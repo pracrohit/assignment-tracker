@@ -2,7 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.jetbrains.kotlin.ksp)
-
+    id("com.google.gms.google-services")
+    id ("kotlin-parcelize")
 }
 
 android {
@@ -46,8 +47,15 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.android.room.runtime)
+    implementation(libs.google.firebase.database.ktx)
+    implementation(libs.firebase.database)
     ksp(libs.android.room.compiler)
     implementation(libs.android.room.ktx)
+    implementation(platform(libs.firebase.bom))
+   // implementation(libs.implementation.com.firebase.database.ktx)
+    implementation ("com.google.firebase:firebase-analytics:17.5.0")
+
+    //implementation(libs.firebase.analytics)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

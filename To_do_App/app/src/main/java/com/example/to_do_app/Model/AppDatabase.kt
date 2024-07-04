@@ -2,10 +2,15 @@
 package com.example.to_do_app.Model
 
 import android.content.Context
+import android.os.Parcelable
 import androidx.room.*
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.flow.Flow
+import kotlinx.parcelize.Parcelize
+
 import java.util.*
 
 @Entity(tableName = "tasks")
@@ -31,14 +36,25 @@ interface TaskDao {
     @Query("SELECT * FROM tasks WHERE deletedAt IS NULL")
     fun getAllTasks(): Flow<List<Task>>
 
+    @Query("SELECT * FROM tasks")
+    fun FetchAll(): Flow<List<Task>>
+
     @Query("SELECT * FROM tasks WHERE id = :taskId")
     suspend fun getTaskById(taskId: Int): Task?
+
 
 }
 @Database(entities = [Task::class], version = 2, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDao
+    private val firebaseDatabase: FirebaseDatabase by lazy {
+        FirebaseDatabase.getInstance()
+    }
+
+    fun getFirebaseTasksReference(): DatabaseReference {
+        return firebaseDatabase.reference.child("tasks")
+    }
 
     companion object {
         @Volatile

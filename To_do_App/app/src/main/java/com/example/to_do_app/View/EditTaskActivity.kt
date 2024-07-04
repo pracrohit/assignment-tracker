@@ -7,6 +7,7 @@ import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.to_do_app.Model.AppDatabase
+import com.example.to_do_app.Model.Repo.TaskRepository
 import com.example.to_do_app.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,7 +18,7 @@ class EditTaskActivity : AppCompatActivity() {
     private lateinit var taskTitleEditText: EditText
     private lateinit var saveButton: Button
     private var taskId: Int = -1
-
+    private lateinit var taskRepository: TaskRepository
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,6 +59,7 @@ class EditTaskActivity : AppCompatActivity() {
                     it.taskTitle = newTaskTitle
                     database.taskDao().updateTask(it)
                 }
+                taskRepository.syncAllTasks()
                 finish()
             }
         } else {

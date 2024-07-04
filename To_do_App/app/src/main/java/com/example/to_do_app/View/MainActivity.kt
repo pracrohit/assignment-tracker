@@ -1,8 +1,8 @@
 package com.example.to_do_app.View
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import android.widget.Button
 import android.widget.SearchView
 import android.widget.TextView
@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.to_do_app.Model.AppDatabase
+import com.example.to_do_app.Model.Repo.TaskRepository
 import com.example.to_do_app.Model.RetrofitInstance
 import com.example.to_do_app.Model.Task
 import com.example.to_do_app.R
@@ -27,8 +28,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var taskAdapter: TaskAdapter
     private lateinit var searchView: SearchView
+    private lateinit var taskRepository: TaskRepository
     private val tasksFlow = MutableStateFlow<List<Task>>(emptyList())
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +43,7 @@ class MainActivity : AppCompatActivity() {
 
         // Initialize Room database and RecyclerView
         database = AppDatabase.getDatabase(this)
+        taskRepository = TaskRepository(database.taskDao())
         taskAdapter = TaskAdapter(
             onDeleteClick = { task -> deleteTask(task) },
             onEditClick = { task -> editTask(task) },
@@ -62,6 +64,7 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, AddingTask::class.java)
             startActivity(intent)
         }
+
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
@@ -72,6 +75,9 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
         })
+        lifecycleScope.launch {
+            taskRepository.syncAllTasks()
+        }
 
     }
 
@@ -104,32 +110,31 @@ class MainActivity : AppCompatActivity() {
 
     private fun fetchTasksFromDb() {
         lifecycleScope.launch {
-            val tasks: Flow<List<Task>> = database.taskDao().getAllTasks()
-
+            val tasks: Flow<List<Task>> = taskRepository.getAllTasks()
             taskAdapter.setTasks(tasks)
+                //   taskRepository.insertTask(tasks)
         }
     }
+
     private fun deleteTask(task: Task) {
         lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                database.taskDao().deleteTask(task)
-            }
+            taskRepository.deleteTask(task)
             fetchTasksFromDb() // Refresh the tasks after deletion
         }
     }
+
     private fun editTask(task: Task) {
         val intent = Intent(this, EditTaskActivity::class.java)
         intent.putExtra("taskId", task.id)
         startActivity(intent)
     }
+
     private fun updateTaskStatus(task: Task) {
         lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                database.taskDao().updateTask(task)
-            }
+            taskRepository.updateTask(task)
             fetchTasksFromDb()
+
         }
     }
-
 
 }

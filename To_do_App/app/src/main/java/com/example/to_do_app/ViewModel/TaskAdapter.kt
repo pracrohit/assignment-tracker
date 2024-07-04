@@ -32,7 +32,9 @@ class TaskAdapter(private val onDeleteClick: (Task) -> Unit, private val onEditC
 
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
         val task = filteredTasks[position]
-        holder.taskTitle.text = task.taskTitle
+        var str=""
+        if(task.completed) str="is completed"
+        holder.taskTitle.text = "${task.taskTitle} ${str}"
         holder.deleteButton.setOnClickListener {
             onDeleteClick(task)
         }

@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.to_do_app.Model.AppDatabase
+import com.example.to_do_app.Model.Repo.TaskRepository
 import com.example.to_do_app.Model.Task
 import com.example.to_do_app.R
 import kotlinx.coroutines.launch
@@ -16,6 +17,7 @@ class AddingTask : AppCompatActivity() {
     private lateinit var editText: EditText
     private lateinit var openHome: Button
     private lateinit var database: AppDatabase
+    private lateinit var taskRepository: TaskRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,8 +33,11 @@ class AddingTask : AppCompatActivity() {
                 val task = Task(taskTitle = taskTitle)
                 lifecycleScope.launch {
                     database.taskDao().insertTask(task)
+                   // taskRepository.insertTask(task)
+
                     Toast.makeText(this@AddingTask, "Task added", Toast.LENGTH_SHORT).show()
                 }
+
             } else {
                 Toast.makeText(this@AddingTask, "Task title cannot be empty", Toast.LENGTH_SHORT).show()
             }
@@ -43,3 +48,4 @@ class AddingTask : AppCompatActivity() {
         }
     }
 }
+
